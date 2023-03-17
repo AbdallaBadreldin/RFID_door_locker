@@ -1,0 +1,30 @@
+In hex:  C9 0C 3A 3B
+In dec:  201 012 58 59
+
+Access Control Example v0.1
+MFRC522 Software Version: 0x88 (unknown),probably a chinese clone?
+-------------------
+Master Card's UID
+C9C3A3B
+-------------------
+Everything Ready
+Waiting PICCs to be scanned
+Scanned PICC's UID:
+C9C3A3B
+Hello Master - Entered Program Mode
+I have 255 record(s) on EEPROM
+Scan a PICC to ADD or REMOVE to EEPROM
+Scan Master Card again to Exit Program Mode
+-----------------------------
+Scanned PICC's UID:
+C9C3A3B
+Master Card Scanned
+Exiting Program Mode
+-----------------------------
+Scanned PICC's UID:
+C9C3A3B
+Hello Master - Entered Program Mode
+I have 255 record(s) on EEPROM
+Scan a PICC to ADD or REMOVE to EEPROM
+Scan Master Card again to Exit Program Mode
+-----------------------------

@@ -1,0 +1,133 @@
+/*
+ * 
+ * All the resources for this project: https://www.hackster.io/Aritro
+ * Modified by Aritro Mukherjee
+ * 
+ * 
+ */
+ #include<EEPROM.h>
+#include <Servo.h> 
+#include <SPI.h>
+#include <MFRC522.h>
+#include <SoftwareSerial.h>
+SoftwareSerial Genotronex(0, 1); // RX, TX
+ int BluetoothData;
+ 
+#define SS_PIN 10
+#define RST_PIN 9
+MFRC522 mfrc522(SS_PIN, RST_PIN);   // Create MFRC522 instance.
+Servo myservo;  // create servo object to control a servo
+// twelve servo objects can be created on most boards
+
+int pos = 0;    // variable to store the servo position
+char data = 0;  //Variable for storing received blutooth data
+
+void setup() 
+{
+  analogWrite(A0,0);
+   Genotronex.begin(9600);
+Genotronex.println("Bluetooth Is ready");
+pinMode(2, OUTPUT);
+pinMode(3, OUTPUT);
+pinMode(4, OUTPUT);
+pinMode(5, OUTPUT);
+pinMode(7, OUTPUT);
+  myservo.attach(8);  // attaches the servo on pin 9 to the servo object
+ Serial.begin(9600);   // Initiate a serial communication 
+ SPI.begin();      // Initiate  SPI bus
+  mfrc522.PCD_Init();   // Initiate MFRC522
+ Serial.println("Approximate your card to the reader or use blutooth...");
+  Serial.println();
+}
+void loop() 
+{
+  digitalWrite(7,LOW);
+ 
+  myservo.write(pos);
+  
+  if (Genotronex.available()){
+BluetoothData=Genotronex.read();
+ Serial.print(BluetoothData);          //Print Value inside data in Serial monitor
+  Serial.print("\n");  
+   if(BluetoothData=='1' && pos==90){      // Send data only when you receive data:
+  digitalWrite(4, HIGH);
+  digitalWrite(2, LOW);//If value is 1 then green LED turns ON
+   }
+  else if(BluetoothData=='1'&&pos==0){      // Send data only when you receive data:      
+  digitalWrite(4, HIGH);
+  digitalWrite(2, LOW);//If value is 1 then green LED turns ON
+   for (pos = 0; pos < 90; pos += 1) { // goes from 0 degrees to 90 degrees
+    digitalWrite(4, HIGH);
+    digitalWrite(2,LOW);
+    myservo.write(pos);              // tell servo to go to position in variable 'pos'
+      delay(15);}} 
+
+  
+else if(BluetoothData=='2'&&pos==0){   // Checks whether value of data is equal to 1
+   digitalWrite(4, LOW);
+   digitalWrite(2, HIGH); } 
+else if (BluetoothData=='2'&&pos==90){
+  digitalWrite(2, HIGH); 
+   digitalWrite(4, LOW);//If value is 1 then green LED turns ON
+   for (pos = 90; pos > 0; pos -= 1) { // goes from 0 degrees to 90 degrees 
+    myservo.write(pos);              // tell servo to go to position in variable 'pos'
+      delay(15);}} 
+   }
+  
+   
+  if ( ! mfrc522.PICC_IsNewCardPresent())  // Look for new cards
+  {
+    return;
+  }
+  // Select one of the cards
+  if ( ! mfrc522.PICC_ReadCardSerial()) 
+  {
+    return;
+  }
+  //Show UID on serial monitor
+  Serial.print("UID tag :");
+  String content= "";
+  byte letter;
+  for (byte i = 0; i < mfrc522.uid.size; i++) 
+  {
+     Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
+     Serial.print(mfrc522.uid.uidByte[i], HEX);
+     content.concat(String(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " "));
+     content.concat(String(mfrc522.uid.uidByte[i], HEX));
+  }
+  analogWrite(A0,100);
+  Serial.println();
+  Serial.print("Message : ");
+  content.toUpperCase();
+  if (content.substring(1) == "62 A4 61 FC" && pos==0) //change here the UID of the card/cards that you want to give access
+  {
+    Serial.println("Authorized access opening.....");
+    Serial.println();
+  for (pos = 0; pos < 90; pos += 1) { // goes from 0 degrees to 90 degrees
+    // in steps of 1 degree
+    myservo.write(pos);              // tell servo to go to position in variable 'pos'
+    delay(15);                       // waits 15ms for the servo to reach the position
+  }  
+   digitalWrite(4, HIGH);
+   digitalWrite(2, LOW);}
+  else if (content.substring(1) == "62 A4 61 FC" && pos==90)   {
+   Serial.println("Authorized access closing....");
+    Serial.println();
+  for (pos = 90; pos > 0; pos -= 1) { // goes from 90 degrees to 0 degrees
+    myservo.write(pos);              // tell servo to go to position in variable 'pos'
+    delay(15);                       // waits 15ms for the servo to reach the position
+  }
+  digitalWrite(2, HIGH);
+  digitalWrite(4, LOW);
+ 
+  }
+
+//------------------------------------------
+  
+  
+ 
+ else   {
+    Serial.println(" Access denied");
+    delay(15);
+ }}
+ 
